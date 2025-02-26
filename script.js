@@ -18,7 +18,7 @@ const render = () => {
         news.description = "내용없음";
       }
       if (news.description.length > 199) {
-        news.description = news.description.substring(0, 199) + "...";
+        news.description = news.description.substring(0, 200) + "...";
       }
       if (!news.source.name) {
         news.source.name = "No Source";
