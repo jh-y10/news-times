@@ -70,7 +70,7 @@ const getNewsByKeyword = async () => {
   render();
 };
 
-$searchInput.addEventListener("keyup", (event) => {
+$searchInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     getNewsByKeyword();
   }
