@@ -48,6 +48,7 @@
   border-radius: 10px;
   background: none;
   padding: 0.5rem;
+  color: #000;
 }
 .head-button-area button:hover {
   background-color: lightgray;
