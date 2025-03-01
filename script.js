@@ -16,9 +16,15 @@ let searchSwitch = false;
 let url = new URL(
   `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr`
 );
+let totalResults = 0;
+let page = 1;
+const pageSize = 10;
+const groupSize = 5;
 
 const getNews = async () => {
   try {
+    url.searchParams.set("page", page);
+    url.searchParams.set("pageSize", pageSize);
     const response = await fetch(url);
     const data = await response.json();
     if (response.status === 200) {
@@ -26,7 +32,9 @@ const getNews = async () => {
         throw new Error("No Result for this search");
       }
       newsList = data.articles;
+      totalResults = data.totalResults;
       render();
+      paginationRender();
     } else {
       throw new Error(data.message);
     }
@@ -39,7 +47,7 @@ const getLatestNews = async () => {
   url = new URL(
     `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr`
   );
-  getNews();
+  await getNews();
 };
 
 const render = () => {
@@ -80,12 +88,99 @@ const errorRender = (errorMessage) => {
   document.getElementById("news-board").innerHTML = errorHTML;
 };
 
+const paginationRender = () => {
+  const totalPages = Math.ceil(totalResults / pageSize);
+  const pageGroup = Math.ceil(page / groupSize);
+  const lastPage =
+    pageGroup * groupSize > totalPages ? totalPages : pageGroup * groupSize;
+  const firstPage =
+    lastPage - (groupSize - 1) <= 0 ? 1 : lastPage - (groupSize - 1);
+  let paginationHTML = ``;
+  if (page === firstPage) {
+    paginationHTML = `<li class="page-item disabled">
+      <a class="page-link" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>`;
+  } else {
+    paginationHTML = `<li class="page-item" onclick="moveToPage(${page - 1})">
+      <a class="page-link" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>`;
+  }
+  for (let i = firstPage; i <= lastPage; i++) {
+    paginationHTML += `<li class="page-item ${
+      i === page ? "active" : ""
+    }" onclick="moveToPage(${i})">
+        <a class="page-link">
+          ${i}
+        </a>
+      </li>`;
+    if (i === lastPage) {
+      if (page === lastPage) {
+        paginationHTML += `<li class="page-item disabled">
+      <a class="page-link" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>`;
+      } else {
+        paginationHTML += `<li class="page-item" onclick="moveToPage(${
+          page + 1
+        })">
+        <a class="page-link" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>`;
+      }
+    }
+  }
+
+  document.querySelector(".pagination").innerHTML = paginationHTML;
+
+  // <nav aria-label="Page navigation example">
+  //   <ul class="pagination">
+  //     <li class="page-item">
+  //       <a class="page-link" href="#" aria-label="Previous">
+  //         <span aria-hidden="true">&laquo;</span>
+  //       </a>
+  //     </li>
+  //     <li class="page-item">
+  //       <a class="page-link" href="#">
+  //         1
+  //       </a>
+  //     </li>
+  //     <li class="page-item">
+  //       <a class="page-link" href="#">
+  //         2
+  //       </a>
+  //     </li>
+  //     <li class="page-item">
+  //       <a class="page-link" href="#">
+  //         3
+  //       </a>
+  //     </li>
+  //     <li class="page-item">
+  //       <a class="page-link" href="#" aria-label="Next">
+  //         <span aria-hidden="true">&raquo;</span>
+  //       </a>
+  //     </li>
+  //   </ul>
+  // </nav>;
+};
+
+const moveToPage = (pageNum) => {
+  page = pageNum;
+  getNews();
+};
+
 const getNewsByCategory = async (event) => {
   const category = event.target.textContent.toLowerCase();
   url = new URL(
     `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}`
   );
-  getNews();
+  page = 1;
+  await getNews();
 };
 
 const getNewsByKeyword = async () => {
@@ -94,7 +189,8 @@ const getNewsByKeyword = async () => {
   url = new URL(
     `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&q=${keyword}`
   );
-  getNews();
+  page = 1;
+  await getNews();
 };
 
 $searchInput.addEventListener("keydown", (event) => {
