@@ -26,6 +26,7 @@
   background: none;
   border: none;
   border-radius: 10px;
+  color: #000;
 }
 .side-menu-button-area {
   display: flex;
@@ -35,6 +36,7 @@
 .side-menu-button-area button {
   margin-bottom: 1rem;
   width: 120px;
+  color: #000;
 }
 .side-menu-button-area button:hover {
   background-color: #000;
