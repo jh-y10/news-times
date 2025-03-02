@@ -96,16 +96,26 @@ const paginationRender = () => {
   const firstPage =
     lastPage - (groupSize - 1) <= 0 ? 1 : lastPage - (groupSize - 1);
   let paginationHTML = ``;
-  if (page === firstPage) {
+  if (page === 1) {
     paginationHTML = `<li class="page-item disabled">
       <a class="page-link" aria-label="Previous">
         <span aria-hidden="true">&laquo;</span>
       </a>
+    </li>
+    <li class="page-item disabled">
+      <a class="page-link" aria-label="Previous">
+        <span aria-hidden="true">&lt;</span>
+      </a>
     </li>`;
   } else {
-    paginationHTML = `<li class="page-item" onclick="moveToPage(${page - 1})">
+    paginationHTML = `<li class="page-item" onclick="moveToPage(1)">
       <a class="page-link" aria-label="Previous">
         <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    <li class="page-item" onclick="moveToPage(${page - 1})">
+      <a class="page-link" aria-label="Previous">
+        <span aria-hidden="true">&lt;</span>
       </a>
     </li>`;
   }
@@ -117,61 +127,38 @@ const paginationRender = () => {
           ${i}
         </a>
       </li>`;
-    if (i === lastPage) {
-      if (page === lastPage) {
-        paginationHTML += `<li class="page-item disabled">
-      <a class="page-link" aria-label="Next">
-        <span aria-hidden="true">&raquo;</span>
-      </a>
-    </li>`;
-      } else {
-        paginationHTML += `<li class="page-item" onclick="moveToPage(${
-          page + 1
-        })">
-        <a class="page-link" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>`;
-      }
-    }
+  }
+
+  if (page === totalPages) {
+    paginationHTML += `<li class="page-item disabled">
+  <a class="page-link" aria-label="Next">
+    <span aria-hidden="true">&gt;</span>
+  </a>
+</li>
+<li class="page-item disabled">
+  <a class="page-link" aria-label="Next">
+    <span aria-hidden="true">&raquo;</span>
+  </a>
+</li>`;
+  } else {
+    paginationHTML += `<li class="page-item" onclick="moveToPage(${page + 1})">
+    <a class="page-link" aria-label="Next">
+      <span aria-hidden="true">&gt;</span>
+    </a>
+  </li>
+  <li class="page-item" onclick="moveToPage(${totalPages})">
+    <a class="page-link" aria-label="Next">
+      <span aria-hidden="true">&raquo;</span>
+    </a>
+  </li>`;
   }
 
   document.querySelector(".pagination").innerHTML = paginationHTML;
-
-  // <nav aria-label="Page navigation example">
-  //   <ul class="pagination">
-  //     <li class="page-item">
-  //       <a class="page-link" href="#" aria-label="Previous">
-  //         <span aria-hidden="true">&laquo;</span>
-  //       </a>
-  //     </li>
-  //     <li class="page-item">
-  //       <a class="page-link" href="#">
-  //         1
-  //       </a>
-  //     </li>
-  //     <li class="page-item">
-  //       <a class="page-link" href="#">
-  //         2
-  //       </a>
-  //     </li>
-  //     <li class="page-item">
-  //       <a class="page-link" href="#">
-  //         3
-  //       </a>
-  //     </li>
-  //     <li class="page-item">
-  //       <a class="page-link" href="#" aria-label="Next">
-  //         <span aria-hidden="true">&raquo;</span>
-  //       </a>
-  //     </li>
-  //   </ul>
-  // </nav>;
 };
 
-const moveToPage = (pageNum) => {
+const moveToPage = async(pageNum) => {
   page = pageNum;
-  getNews();
+  await getNews();
 };
 
 const getNewsByCategory = async (event) => {
@@ -185,15 +172,15 @@ const getNewsByCategory = async (event) => {
 
 const getNewsByKeyword = async () => {
   const keyword = $searchInput.value;
-  $searchInput.value = "";
   url = new URL(
     `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&q=${keyword}`
   );
+  $searchInput.value = "";
   page = 1;
   await getNews();
 };
 
-$searchInput.addEventListener("keydown", (event) => {
+$searchInput.addEventListener("keypress", (event) => {
   if (event.key === "Enter") {
     getNewsByKeyword();
   }
