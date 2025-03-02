@@ -90,6 +90,7 @@ const errorRender = (errorMessage) => {
 
 const paginationRender = () => {
   const totalPages = Math.ceil(totalResults / pageSize);
+  console.log("total", totalPages);
   const pageGroup = Math.ceil(page / groupSize);
   const lastPage =
     pageGroup * groupSize > totalPages ? totalPages : pageGroup * groupSize;
@@ -180,7 +181,7 @@ const getNewsByKeyword = async () => {
   await getNews();
 };
 
-$searchInput.addEventListener("keypress", (event) => {
+$searchInput.addEventListener("keyup", (event) => {
   if (event.key === "Enter") {
     getNewsByKeyword();
   }
